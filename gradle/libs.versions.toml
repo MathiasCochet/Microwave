@@ -1,6 +1,6 @@
 [versions]
 agp = "8.5.0"
-hiltAndroid = "2.44"
+hiltAndroid = "2.51.1"
 kotlin = "1.9.0"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -37,5 +37,5 @@ androidx-lifecycle-compose-viewmodel = { group = "androidx.lifecycle", name = "l
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-android-hilt = { id = "com.google.dagger.hilt.android", version = "2.44" }
+android-hilt = { id = "com.google.dagger.hilt.android", version = "2.51.1" }
 

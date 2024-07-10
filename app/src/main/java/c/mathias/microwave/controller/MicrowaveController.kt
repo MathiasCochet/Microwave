@@ -1,4 +1,4 @@
-package c.mathias.microwave
+package c.mathias.microwave.controller
 
 import kotlinx.coroutines.flow.SharedFlow
 
