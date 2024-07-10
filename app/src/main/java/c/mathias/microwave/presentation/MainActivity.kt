@@ -33,7 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import c.mathias.microwave.R
 import c.mathias.microwave.presentation.theme.MicrowaveTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +80,7 @@ fun Body(modifier: Modifier = Modifier) {
             Card(
                 modifier = Modifier.size(150.dp),
                 colors = CardDefaults.cardColors()
-                    .copy(containerColor = if (uiState.lightOn) Color(0xFFFFA500) else Color.LightGray),
+                    .copy(containerColor = if (uiState.heaterOn) Color(0xFFFFA500) else Color.LightGray),
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
