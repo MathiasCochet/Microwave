@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -57,6 +58,12 @@ class MainActivity : ComponentActivity() {
 fun Body(modifier: Modifier = Modifier) {
     val viewModel: MainViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val event = viewModel::handleEvent
+
+    LaunchedEffect(Unit) {
+        viewModel.initialize()
+    }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -69,8 +76,18 @@ fun Body(modifier: Modifier = Modifier) {
             contentDescription = ""
         )
         Button(
-            content = { if (uiState.doorOpen) Text("Close Door") else Text("Open Door") },
-            onClick = { viewModel.updateDoorStatus() },
+            content = {
+                if (uiState.doorOpen)
+                    Text("Close Door")
+                else
+                    Text("Open Door")
+            },
+            onClick = {
+                if (uiState.doorOpen)
+                    event(MainEvent.CloseDoor)
+                else
+                    event(MainEvent.OpenDoor)
+            },
         )
         Spacer(modifier = Modifier.height(64.dp))
         Row(
@@ -103,7 +120,7 @@ fun Body(modifier: Modifier = Modifier) {
             Card(
                 modifier = Modifier.size(150.dp),
                 colors = CardDefaults.cardColors()
-                    .copy(containerColor = if (uiState.lightOn) Color.Yellow else Color.LightGray),
+                    .copy(containerColor = if (uiState.doorOpen) Color.Yellow else Color.LightGray),
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
