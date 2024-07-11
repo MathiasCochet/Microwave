@@ -89,6 +89,14 @@ fun Body(modifier: Modifier = Modifier) {
                     event(MainEvent.OpenDoor)
             },
         )
+        Button(
+            content = {
+                Text("Start")
+            },
+            onClick = {
+                event(MainEvent.StartMicroWave)
+            }
+        )
         Spacer(modifier = Modifier.height(64.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
