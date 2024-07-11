@@ -19,4 +19,5 @@ interface MicrowaveController {
 
     /** Signals that the start button is pressed */
     val startButtonPressed: SharedFlow<Unit>
+
 }
