@@ -1,6 +1,7 @@
 package c.mathias.microwave.manager
 
-import c.mathias.microwave.presentation.MicrowaveController
+import c.mathias.microwave.controller.MicrowaveController
+import c.mathias.microwave.controller.MicrowaveDoorState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,8 +18,8 @@ class MicrowaveManagerImpl(
     override suspend fun start(microwave: MicrowaveController) {
         job = CoroutineScope(coroutineDispatcher).launch {
             launch {
-                listenToDoorStatus(microwave.doorStatusChanged) { doorIsClosed ->
-                    if (!doorIsClosed) microwave.turnOffHeater()
+                listenToDoorStatus(microwave.doorStatusChanged) {
+                    if (it == MicrowaveDoorState.Open) microwave.turnOffHeater()
                 }
             }
             launch {
@@ -34,8 +35,8 @@ class MicrowaveManagerImpl(
     }
 
     private suspend fun listenToDoorStatus(
-        doorStatus: SharedFlow<Boolean>,
-        openDoor: (Boolean) -> Unit
+        doorStatus: SharedFlow<MicrowaveDoorState>,
+        openDoor: (MicrowaveDoorState) -> Unit
     ) {
         doorStatus.collect {
             openDoor(it)

@@ -1,8 +1,7 @@
-package c.mathias.microwave.presentation
+package c.mathias.microwave.controller
 
 import kotlinx.coroutines.flow.SharedFlow
 
-/** Interface to the microwave oven. */
 
 interface MicrowaveController {
     /** Turns on the microwave heater element. */
@@ -16,7 +15,7 @@ interface MicrowaveController {
     fun isDoorOpen(): Boolean
 
     /** Signals that the door is opened or closed */
-    val doorStatusChanged: SharedFlow<Boolean>
+    val doorStatusChanged: SharedFlow<MicrowaveDoorState>
 
     /** Signals that the start button is pressed */
     val startButtonPressed: SharedFlow<Unit>

@@ -1,6 +1,7 @@
 package c.mathias.microwave.manager
 
-import c.mathias.microwave.presentation.MicrowaveController
+import c.mathias.microwave.controller.MicrowaveController
+import c.mathias.microwave.controller.MicrowaveDoorState
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
@@ -25,16 +26,16 @@ class MicrowaveManagerTest {
     @RelaxedMockK
     private lateinit var microwaveController: MicrowaveController
 
+    private val _doorStatusChanged = MutableSharedFlow<MicrowaveDoorState>()
     private val _startButtonPressed = MutableSharedFlow<Unit>()
-    private val _doorStatusChanged = MutableSharedFlow<Boolean>()
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
         microwaveManager = MicrowaveManagerImpl(Dispatchers.Main)
 
-        coEvery { microwaveController.startButtonPressed } returns _startButtonPressed
         coEvery { microwaveController.doorStatusChanged } returns _doorStatusChanged
+        coEvery { microwaveController.startButtonPressed } returns _startButtonPressed
     }
 
     @AfterEach
@@ -68,7 +69,7 @@ class MicrowaveManagerTest {
     fun `heater turns off when door is opened`() = runTest {
         microwaveManager.start(microwaveController)
 
-        _doorStatusChanged.emit(false)
+        _doorStatusChanged.emit(MicrowaveDoorState.Open)
 
         coVerify { microwaveController.turnOffHeater() }
     }
@@ -77,7 +78,7 @@ class MicrowaveManagerTest {
     fun `heater doesn't turn on when door is closed`() = runTest {
         microwaveManager.start(microwaveController)
 
-        _doorStatusChanged.emit(true)
+        _doorStatusChanged.emit(MicrowaveDoorState.Closed)
 
         coVerify(exactly = 0) { microwaveController.turnOnHeater() }
     }

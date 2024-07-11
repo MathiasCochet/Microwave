@@ -2,6 +2,8 @@ package c.mathias.microwave.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import c.mathias.microwave.controller.MicrowaveController
+import c.mathias.microwave.controller.MicrowaveDoorState
 import c.mathias.microwave.manager.MicrowaveManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,7 +17,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val interactor: MicrowaveManager
 ) : ViewModel(), MicrowaveController {
-    private val _doorStatusChanged = MutableSharedFlow<Boolean>()
+    private val _doorStatusChanged = MutableSharedFlow<MicrowaveDoorState>()
     private val _startButtonPressed = MutableSharedFlow<Unit>()
 
     private val _uiState = MutableStateFlow(MainUIState())
@@ -37,18 +39,20 @@ class MainViewModel @Inject constructor(
             MainEvent.CloseDoor -> {
                 setState { doorOpen = false }
                 viewModelScope.launch {
-                    _doorStatusChanged.emit(uiState.value.doorOpen)
+                    _doorStatusChanged.emit(MicrowaveDoorState.Closed)
                 }
             }
 
             MainEvent.OpenDoor -> {
                 setState { doorOpen = true }
                 viewModelScope.launch {
-                    _doorStatusChanged.emit(uiState.value.doorOpen)
+                    _doorStatusChanged.emit(MicrowaveDoorState.Open)
                 }
             }
 
-            MainEvent.StartMicroWave -> _startButtonPressed.tryEmit(Unit)
+            MainEvent.StartMicroWave -> viewModelScope.launch {
+                _startButtonPressed.emit(Unit)
+            }
         }
     }
 
@@ -58,7 +62,7 @@ class MainViewModel @Inject constructor(
 
     override fun isDoorOpen(): Boolean = uiState.value.doorOpen
 
-    override val doorStatusChanged: SharedFlow<Boolean> get() = _doorStatusChanged
+    override val doorStatusChanged: SharedFlow<MicrowaveDoorState> get() = _doorStatusChanged
 
     override val startButtonPressed: SharedFlow<Unit> get() = _startButtonPressed
 
