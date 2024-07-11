@@ -13,4 +13,5 @@ interface HeaterTimer {
     fun finished(): Boolean
 
     fun stop()
+
 }

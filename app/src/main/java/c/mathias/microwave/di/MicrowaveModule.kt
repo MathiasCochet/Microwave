@@ -22,4 +22,5 @@ class MicrowaveModule {
     @Singleton
     fun provideMicrowaveInteractor(heaterTimer: HeaterTimer): MicrowaveManager =
         MicrowaveManagerImpl(heaterTimer)
+
 }

@@ -17,6 +17,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val microwaveManager: MicrowaveManager
 ) : ViewModel(), MicrowaveController {
+
     private val _doorStatusChanged = MutableSharedFlow<MicrowaveDoorState>()
     private val _startButtonPressed = MutableSharedFlow<Unit>()
 

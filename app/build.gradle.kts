@@ -83,10 +83,11 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     testImplementation(libs.mockk)
-    testImplementation (libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testImplementation (libs.kotlinx.coroutines.test)
-    testImplementation (libs.kotlinx.coroutines.android)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotlinx.coroutines.android)
+    testImplementation(libs.turbine)
 }
 
 kapt {
