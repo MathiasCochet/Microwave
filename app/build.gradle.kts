@@ -51,6 +51,10 @@ android {
     }
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -73,6 +77,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.compose.viewmodel)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    testImplementation(libs.mockk)
+    testImplementation (libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation (libs.kotlinx.coroutines.android)
 }
 
 kapt {

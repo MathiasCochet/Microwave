@@ -1,7 +1,7 @@
 package c.mathias.microwave.di
 
-import c.mathias.microwave.controller.MicrowaveController
-import c.mathias.microwave.controller.MicrowaveControllerImpl
+import c.mathias.microwave.manager.MicrowaveManager
+import c.mathias.microwave.manager.MicrowaveManagerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +14,6 @@ class MicrowaveModule {
 
     @Provides
     @Singleton
-    fun provideMicrowaveController(): MicrowaveController = MicrowaveControllerImpl()
+    fun provideMicrowaveInteractor(): MicrowaveManager = MicrowaveManagerImpl()
 
 }
