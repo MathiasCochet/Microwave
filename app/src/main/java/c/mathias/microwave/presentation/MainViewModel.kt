@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val interactor: MicrowaveManager
+    private val microwaveManager: MicrowaveManager
 ) : ViewModel(), MicrowaveController {
     private val _doorStatusChanged = MutableSharedFlow<MicrowaveDoorState>()
     private val _startButtonPressed = MutableSharedFlow<Unit>()
@@ -25,13 +25,13 @@ class MainViewModel @Inject constructor(
 
     fun initialize() {
         viewModelScope.launch {
-            interactor.start(this@MainViewModel)
+            microwaveManager.start(this@MainViewModel)
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        interactor.stop()
+        microwaveManager.stop()
     }
 
     fun handleEvent(event: MainEvent) {

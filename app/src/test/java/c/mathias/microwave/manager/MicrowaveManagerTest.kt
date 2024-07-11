@@ -2,10 +2,14 @@ package c.mathias.microwave.manager
 
 import c.mathias.microwave.controller.MicrowaveController
 import c.mathias.microwave.controller.MicrowaveDoorState
+import c.mathias.microwave.tools.HeaterTimer
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.just
+import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,6 +28,9 @@ class MicrowaveManagerTest {
     private lateinit var microwaveManager: MicrowaveManagerImpl
 
     @RelaxedMockK
+    private lateinit var heaterTimer: HeaterTimer
+
+    @RelaxedMockK
     private lateinit var microwaveController: MicrowaveController
 
     private val _doorStatusChanged = MutableSharedFlow<MicrowaveDoorState>()
@@ -32,7 +39,7 @@ class MicrowaveManagerTest {
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        microwaveManager = MicrowaveManagerImpl(Dispatchers.Main)
+        microwaveManager = MicrowaveManagerImpl(heaterTimer, Dispatchers.Main)
 
         coEvery { microwaveController.doorStatusChanged } returns _doorStatusChanged
         coEvery { microwaveController.startButtonPressed } returns _startButtonPressed
@@ -44,14 +51,38 @@ class MicrowaveManagerTest {
     }
 
     @Test
-    fun `heater turns on when start button is pressed and door is closed`() = runTest {
+    fun `heater timer starts when start button is pressed and door is closed`() = runTest {
+        val callbackSlot = slot<() -> Unit>()
+
         coEvery { microwaveController.isDoorOpen() } returns false
+        coEvery { heaterTimer.finished() } returns true
+        coEvery { heaterTimer.startTimer(any(), capture(callbackSlot)) } just Runs
 
         microwaveManager.start(microwaveController)
 
         _startButtonPressed.emit(Unit)
+        callbackSlot.captured()
 
         coVerify { microwaveController.turnOnHeater() }
+        coVerify { heaterTimer.startTimer(any(), any()) }
+        coVerify { microwaveController.turnOffHeater() }
+    }
+
+    @Test
+    fun `heater timer increases when I press start again while heater is on`() = runTest {
+        val callbackSlot = slot<() -> Unit>()
+
+        coEvery { microwaveController.isDoorOpen() } returns false
+        coEvery { heaterTimer.finished() } returns false
+        coEvery { heaterTimer.increaseTime(capture(callbackSlot)) } just Runs
+
+        microwaveManager.start(microwaveController)
+
+        _startButtonPressed.emit(Unit)
+        callbackSlot.captured()
+
+        coVerify { heaterTimer.increaseTime(any()) }
+        coVerify { microwaveController.turnOffHeater() }
     }
 
     @Test
@@ -67,19 +98,28 @@ class MicrowaveManagerTest {
 
     @Test
     fun `heater turns off when door is opened`() = runTest {
+        coEvery { microwaveController.isDoorOpen() } returns false
+        coEvery { heaterTimer.finished() } returns false
+        coEvery { heaterTimer.startTimer(any(), any()) } just Runs
+
         microwaveManager.start(microwaveController)
 
         _doorStatusChanged.emit(MicrowaveDoorState.Open)
 
         coVerify { microwaveController.turnOffHeater() }
+        coVerify { heaterTimer.stop() }
     }
 
     @Test
-    fun `heater doesn't turn on when door is closed`() = runTest {
+    fun `closing the door doesn't trigger anything`() = runTest {
+        coEvery { microwaveController.isDoorOpen() } returns true
+        coEvery { heaterTimer.startTimer(any(), any()) } just Runs
+
         microwaveManager.start(microwaveController)
 
         _doorStatusChanged.emit(MicrowaveDoorState.Closed)
 
-        coVerify(exactly = 0) { microwaveController.turnOnHeater() }
+        coVerify(exactly = 0) { microwaveController.turnOffHeater() }
+        coVerify(exactly = 0) { heaterTimer.stop() }
     }
 }
